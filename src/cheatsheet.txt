@@ -1,0 +1,7 @@
+Baseline:
+
+python eval.py --predictions dev.baseline.json --groundtruth dev.label.json
+
+Own experiments:
+
+python eval.py --predictions test-output.json --groundtruth dev.label.json
