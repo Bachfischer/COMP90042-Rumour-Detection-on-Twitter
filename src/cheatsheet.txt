@@ -5,3 +5,7 @@ python eval.py --predictions dev.baseline.json --groundtruth dev.label.json
 Own experiments:
 
 python eval.py --predictions test-output.json --groundtruth dev.label.json
+
+
+Connect to Tensorboard:
+gcloud compute ssh twitter-rumour-detection -- -NfL 6006:localhost:6006
