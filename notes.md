@@ -84,6 +84,16 @@ v30
 BERTweet (num_epochs = 8) and COMBINED dataset (batch_size = 8, with sep_token=" ", url + mentions stripped) 
 v31
 
+BERT Talking Heads base w/ Tensorflow  (num_epochs = 3, batch_size = 4, with sep_token=" ", url + mentions stripped) 
+v32
+
+BERT Talking Heads base w/ Tensorflow and COMBINED dataset (num_epochs = 5, batch_size = 4, with sep_token=" ", url + mentions stripped) 
+v33
+
+BERT Talking Heads large w/ Tensorflow and COMBINED dataset (num_epochs = 5, batch_size = 4, with sep_token=" ", url + mentions stripped) 
+v33
+
+
 ## Multi-modal BERT with custom features:
 - Calculate user features 
 - Calculate tweet features
