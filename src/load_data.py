@@ -3,8 +3,6 @@ import re
 import sys
 import pandas as pd
 import numpy as np
-
-# TODO: Check whether spacy is allowed
 import spacy
 
 nlp = spacy.load("en_core_web_sm")
@@ -149,36 +147,32 @@ def decontracted(phrase):
     phrase = re.sub(r"\'m", " am", phrase)
     return phrase
 
-
-
-def preprocessing(text):
-    """
-    1--> Removing Contraction (Decontraction)
-
-    2--> Dealing with HashTags
-
-    3--> Removing URLs and Email
-
-    4--> Removing Stopwords and Lemmatization
-    """
+def preprocessing(text, perform_stemming):
     text = text.replace('#','')
     text = decontracted(text)
     text = re.sub('\S*@\S*\s?','',text)
-    text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+','',text)
+    
+    if perform_stemming == True:
+        text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+','',text)
+        text = re.sub('[^A-z]', ' ',text.lower())
+    else:
+        text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),])+','',text)
 
-    token=[]
-    result=''
-    text = re.sub('[^A-z]', ' ',text.lower())
-
-    text = nlp(text)
-    for t in text:
-        if not t.is_stop and len(t)>2:  
-            token.append(t.lemma_)
-    result = ' '.join([i for i in token])
-
+    token = []
+    result =''
+    
+    if perform_stemming == True:
+        text = nlp(text)
+        for t in text:
+            if not t.is_stop and len(t)>2:  
+                token.append(t.lemma_)
+        result = ' '.join([i for i in token])
+    else:
+        result = text
+        
     return result.strip()
 
-def load_data(data_file, label_file):
+def load_data(data_file, label_file, perform_stemming):
     
     if label_file != None:
         y_true = json.load(open(label_file))
@@ -201,11 +195,15 @@ def load_data(data_file, label_file):
         # append text from follow-up tweets in tweet chain
         follow_up_tweets = ""
         for i in range(1, len(tweets_in_event)):
-            follow_up_tweets = follow_up_tweets + preprocessing(tweets_in_event[i]['text']) + " [SEP] "
+            #follow_up_tweets = follow_up_tweets + tweets_in_event[i]['text'] + " [SEP] "
+            follow_up_tweets = follow_up_tweets + preprocessing(tweets_in_event[i]['text'], perform_stemming) + " "
         
         # Concatenate text from all tweets in field 'text'
-        tweet['text'] = preprocessing(tweet['text']) + " [SEP] " + follow_up_tweets
+        #tweet['text'] = tweet['text'] + " [SEP] " + follow_up_tweets
+        tweet['text'] = preprocessing(tweet['text'], perform_stemming) + " " + follow_up_tweets
+
         
+        tweet['text'] = tweet['text'].strip()
         if label_file != None:
             tweet['label'] = convert_label(y_true[str(tweet['id'])])
         
