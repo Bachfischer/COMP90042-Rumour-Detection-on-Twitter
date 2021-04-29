@@ -157,11 +157,14 @@ def preprocessing(text, perform_stemming):
         text = re.sub('[^A-z]', ' ',text.lower())
     else:
         text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),])+','',text)
-
-    token = []
-    result =''
+        text = ''.join([i if ord(i) < 128 else '' for i in text])
+        text = text.lower()
     
     if perform_stemming == True:
+
+        token = []
+        result =''
+
         text = nlp(text)
         for t in text:
             if not t.is_stop and len(t)>2:  
@@ -171,6 +174,16 @@ def preprocessing(text, perform_stemming):
         result = text
         
     return result.strip()
+
+def preprocessing_analysis(text):
+    text = text.replace('#','')
+    text = decontracted(text)
+    text = re.sub('\S*@\S*\s?','',text)
+    
+    text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),])+','',text)
+    text = re.sub('[^A-z]', ' ',text.lower())
+        
+    return text.strip()
 
 def load_data(data_file, label_file, perform_stemming):
     
@@ -214,4 +227,46 @@ def load_data(data_file, label_file, perform_stemming):
     return df
 
 
+def load_data_analysis(data_file, label_file):
     
+    if label_file != None:
+        y_true = json.load(open(label_file))
+    
+    with open(data_file, 'r') as data_train:
+        raw_list = list(data_train)
+
+    data_list = []
+
+
+    for event in raw_list:
+        tweets_in_event = json.loads(event)
+
+        tweet = {}
+
+        tweet['id'] = tweets_in_event[0]['id']      
+        tweet['text'] = preprocessing_analysis(tweets_in_event[0]['text'])
+        tweet['hashtags'] = []
+        
+        for i in range(0, len(tweets_in_event)):
+            if len(tweets_in_event[i]['entities']['hashtags']) > 0:
+                for hashtag in tweets_in_event[i]['entities']['hashtags']:
+                    hashtag_lower = hashtag['text'].lower()
+                    tweet['hashtags'].append(hashtag_lower)
+
+        # append text from follow-up tweets in tweet chain
+        follow_up_tweets = ""
+        for i in range(1, len(tweets_in_event)):
+            follow_up_tweets = follow_up_tweets + preprocessing_analysis(tweets_in_event[i]['text']) + " "
+        
+        # Concatenate text from all tweets in field 'text'
+        tweet['text'] = tweet['text'] + " " + follow_up_tweets
+        tweet['text'] = tweet['text'].strip()
+
+        if label_file != None:
+            tweet['label'] = convert_label(y_true[str(tweet['id'])])
+        
+        data_list.append(tweet)
+
+    df = pd.DataFrame(data_list)
+
+    return df
