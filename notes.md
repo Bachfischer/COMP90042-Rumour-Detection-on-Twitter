@@ -124,12 +124,3 @@ Kaggle notebook: https://www.kaggle.com/dhruv1234/huggingface-tfbertmodel
 
 * BBERT (from SemEval 2019)
 Github: https://github.com/MFajcik/RumourEval2019/tree/master/data_analysis
-
-
-Other interesting models:
-
-* RoBERTa
-
-* BERTweet:
-Kaggle notebook: https://www.kaggle.com/davelo12/bertweet
-Kaggle notebook: https://www.kaggle.com/boiledfishpot/twitter-classify-by-bertweet
