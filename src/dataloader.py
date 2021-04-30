@@ -34,13 +34,13 @@ def extract_features(tweet):
     
     # Number of retweets
     tweet_features['retweet_count'] = tweet['retweet_count']
-    #Number of favorites
+    # Number of favorites
     tweet_features['favorite_count'] = tweet['favorite_count']
     
     #Whether tweet has a question mark
     tweet_features['question_mark'] = '?' in tweet['text']
     
-    #Whether tweet contains URLs
+    # Whether tweet contains URLs
     if 'urls' in tweet['entities']:
         number_of_urls = len(tweet['entities']['urls'])
     else: 
@@ -48,10 +48,10 @@ def extract_features(tweet):
         
     tweet_features['contains_url'] = True if number_of_urls > 0 else False
     
-    #Number of URLs embedded in tweet
+    # Number of URLs embedded in tweet
     tweet_features['number_urls'] =  number_of_urls
     
-    #Whether tweet has native media
+    # Whether tweet has native media
     if 'media' in tweet['entities']:
         number_of_media = len(tweet['entities']['media'])
     else: 
@@ -66,17 +66,17 @@ def extract_features(tweet):
     # Number of posts user has posted
     user_features['statuses_count'] = tweet['user']['statuses_count']
     
-    #Number of public lists user belongs to
+    # Number of public lists user belongs to
     user_features['listed_count'] = tweet['user']['listed_count']
 
 
-    #Number of followers
+    # Number of followers
     user_features['followers_count'] = tweet['user']['followers_count']
 
-    #Number of followings
+    # Number of followings
     user_features['friends_count'] = tweet['user']['friends_count']
 
-    #Whether user has a background profile image
+    # Whether user has a background profile image
     if 'profile_background_image_url' in tweet['user']:
         profile_background_image_url = True
     else:
@@ -84,10 +84,10 @@ def extract_features(tweet):
     
     user_features['contains_profile_background_image'] = profile_background_image_url
     
-    #User reputation (i.e., followers/(followings+1))
+    # User reputation (i.e., followers/(followings+1))
     user_features['reputation_score_1'] = user_features['followers_count'] / ( user_features['friends_count'] +1)
     
-    #User reputation (i.e., followers/(followings+followers+1))
+    # User reputation (i.e., followers/(followings+followers+1))
     user_features['reputation_score_2'] = user_features['followers_count'] /(user_features['followers_count'] +
                                                                               user_features['friends_count'] +1)
 
@@ -124,6 +124,7 @@ def extract_features(tweet):
     # Whether user has a description
     user_features['has_description'] = True if length_description > 0 else False
         
+    # Length of user description
     user_features['length_description'] = length_description
 
     
@@ -157,8 +158,7 @@ def preprocessing(text, perform_stemming):
         text = re.sub('[^A-z]', ' ',text.lower())
     else:
         text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),])+','',text)
-        text = ''.join([i if ord(i) < 128 else '' for i in text])
-        text = text.lower()
+        text = re.sub('[^A-z]', ' ',text.lower())
     
     if perform_stemming == True:
 
@@ -175,16 +175,6 @@ def preprocessing(text, perform_stemming):
         
     return result.strip()
 
-def preprocessing_analysis(text):
-    text = text.replace('#','')
-    text = decontracted(text)
-    text = re.sub('\S*@\S*\s?','',text)
-    
-    text = re.sub('http[s]?:(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),])+','',text)
-    text = re.sub('[^A-z]', ' ',text.lower())
-        
-    return text.strip()
-
 def load_data(data_file, label_file, perform_stemming):
     
     if label_file != None:
@@ -198,13 +188,13 @@ def load_data(data_file, label_file, perform_stemming):
 
     for event in raw_list:
         tweets_in_event = json.loads(event)
-
+        
+        ## Task 1
         tweet = {}
-
         tweet['id'] = tweets_in_event[0]['id']
         tweet.update(extract_features(tweets_in_event[0]))
         
-
+        tweet['text'] = preprocessing(tweets_in_event[0]['text'], perform_stemming)
         # append text from follow-up tweets in tweet chain
         follow_up_tweets = ""
         for i in range(1, len(tweets_in_event)):
@@ -213,54 +203,25 @@ def load_data(data_file, label_file, perform_stemming):
         
         # Concatenate text from all tweets in field 'text'
         #tweet['text'] = tweet['text'] + " [SEP] " + follow_up_tweets
-        tweet['text'] = preprocessing(tweet['text'], perform_stemming) + " " + follow_up_tweets
-
-        
+        tweet['text'] += " " + follow_up_tweets
         tweet['text'] = tweet['text'].strip()
-        if label_file != None:
-            tweet['label'] = convert_label(y_true[str(tweet['id'])])
-        
-        data_list.append(tweet)
 
-    df = pd.DataFrame(data_list)
+        ## Task 2
+        tweet['source_tweet'] = preprocessing(tweets_in_event[0]['text'], perform_stemming)  
 
-    return df
+        tweet['replies'] = []
+        for i in range(1, len(tweets_in_event)):
+            reply = preprocessing(tweets_in_event[i]['text'], perform_stemming)
+            if len(reply) > 0:
+                tweet['replies'].append(reply)
 
-
-def load_data_analysis(data_file, label_file):
-    
-    if label_file != None:
-        y_true = json.load(open(label_file))
-    
-    with open(data_file, 'r') as data_train:
-        raw_list = list(data_train)
-
-    data_list = []
-
-
-    for event in raw_list:
-        tweets_in_event = json.loads(event)
-
-        tweet = {}
-
-        tweet['id'] = tweets_in_event[0]['id']      
-        tweet['text'] = preprocessing_analysis(tweets_in_event[0]['text'])
         tweet['hashtags'] = []
-        
         for i in range(0, len(tweets_in_event)):
             if len(tweets_in_event[i]['entities']['hashtags']) > 0:
                 for hashtag in tweets_in_event[i]['entities']['hashtags']:
                     hashtag_lower = hashtag['text'].lower()
                     tweet['hashtags'].append(hashtag_lower)
 
-        # append text from follow-up tweets in tweet chain
-        follow_up_tweets = ""
-        for i in range(1, len(tweets_in_event)):
-            follow_up_tweets = follow_up_tweets + preprocessing_analysis(tweets_in_event[i]['text']) + " "
-        
-        # Concatenate text from all tweets in field 'text'
-        tweet['text'] = tweet['text'] + " " + follow_up_tweets
-        tweet['text'] = tweet['text'].strip()
 
         if label_file != None:
             tweet['label'] = convert_label(y_true[str(tweet['id'])])
