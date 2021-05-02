@@ -8,6 +8,11 @@ v6
 BERT Base (num_epochs = 5, batch_size = 4) (with proper seperation, input_size = 512, perform_stemming = True)
 v7
 
+
+BERT Base (batch_size = 4, perform_stemming=True)
+v8
+
+
 BERT Base (num_epochs = 5, batch_size = 4) (with proper seperation, input_size = 512, perform_stemming=False)
 v9
 
@@ -100,26 +105,6 @@ BERTweet (num_epochs = 6) and COMBINED dataset (batch_size = 8, with sep_token="
 loaded bertweet v18 
 v35
 
-## Multi-modal BERT with custom features:
-- Calculate user features 
-- Calculate tweet features
-- Use BERT model to extract tweet embeddings for each tweet text
-- Train Model (BERT + MLP)
-
-Experiments: 
-
-BERT Base (batch_size = 4, perform_stemming=True)
-v8
-
-
-
-
-Interesting competition: 
-Kaggle: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/code?competitionId=12500&searchQuery=fastai
-
-Notebook: https://www.kaggle.com/alber8295/nb-svm-linear-baseline
-
-
 
 Best system by Liu and Wu (2018) "Early detection of fake news on social media through propagation path classification with recurrent and convolutional networks."
 
@@ -128,15 +113,3 @@ Best system by Liu and Wu (2018) "Early detection of fake news on social media t
 
 
 Papers: https://github.com/JihoChoi/rumor-fake-news-papers
-
-* Conversation trees: 
-Github: https://github.com/jerrygaoLondon/RPDNN
-Github: https://github.com/serenaklm/rumor_detection
-
-* BERT (from Kaggle challenge)
-Kaggle competition: https://www.kaggle.com/c/nlp-getting-started
-Kaggle notebook: https://www.kaggle.com/dhruv1234/huggingface-tfbertmodel
-
-
-* BBERT (from SemEval 2019)
-Github: https://github.com/MFajcik/RumourEval2019/tree/master/data_analysis
