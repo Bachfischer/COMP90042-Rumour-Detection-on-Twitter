@@ -37,7 +37,7 @@ def extract_features(tweet):
     # Number of favorites
     tweet_features['favorite_count'] = tweet['favorite_count']
     
-    #Whether tweet has a question mark
+    # Whether tweet has a question mark
     tweet_features['question_mark'] = '?' in tweet['text']
     
     # Whether tweet contains URLs
@@ -68,7 +68,6 @@ def extract_features(tweet):
     
     # Number of public lists user belongs to
     user_features['listed_count'] = tweet['user']['listed_count']
-
 
     # Number of followers
     user_features['followers_count'] = tweet['user']['followers_count']
