@@ -37,10 +37,15 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{todonotes}
+\usepackage{fixltx2e}
+
+\usepackage{amsmath}
+\usepackage{algorithm,algorithmic}
+
 
 \newcommand\BibTeX{B\textsc{ib}\TeX}
 
-\title{Rumour Prediction and Analysis for Twitter Posts via Transformer-based Architectures}
+\title{BERT-based Rumour Identification and Analysis for Twitter Posts}
 
 \author{ Student ID: 1133751 \\
  COMP90042 Natural Language Processing \\
@@ -57,35 +62,35 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-TBD
+With the ease of access to information and its rapid dissemination across the internet, it has become increasingly difficult to differentiate rumour information from non-rumour information. In order to find ways to combat this issue, the COMP90042 Project 2021 put forward the task of developing a rumour detection system and analysing the nature of rumours that are being propagated on Twitter.
+\newline
+In this paper, we propose three systems using the Transformer architecture that leverage the textual content of conversations on Twitter to identify rumours. We further use these systems to analyze a dataset of 17,548 conversations related to COVID-19 in order to understand the nature of these rumours rumours. To evaluate the performance of our systems, we submitted our models to the COMP90042 CodaLab competition where we managed to achieve an F1-score of 0.837 with our best-performing system \textit{BERTweet}.
 \end{abstract}
 
 \section{Introduction}
-With an increase in the adoption of social media as a news source, it has become easier for miscreants to share false information with millions of users. This can lead to the spread of misinformation, propaganda in some cases even violence and physical harm. 
-Given the volume of rumours (aka fake news) being generated on a regular basis, there is a need for automated identification of rumours to aid in content moderation, as manual identification is cumbersome and time-consuming.
+With an increase in the adoption of social media as a news source, it has become easier for social media users to share false information with millions of users. This can lead to the spread of so-called fake news and rumours which may manipulate the opinion of a huge number of people.
+Given the volume of rumours that are being generated on a day-to-day basis, there is a need for automated identification of rumours to facilitate in content moderation, as manual identification of rumours would involve a huge amount of manual labour.
 \newline
-Fake news detection is a challenging problem because of its evolving nature and context-dependent definition of what is fake \citep{RN675}.For instance, a message shared may have a falsifiable claim but was not shared with the intent to spread misinformation. 
-On the other hand, messages transmitted with the intent to mislead the masses may contain conspiracy theories. These messages may also include some facts that are not related to the message. While it is relatively easy for a human to identify that the facts mentioned have no relation to the claim made, it is challenging to classify news with such facts as fake automatically.
-
+Rumour detection is a challenging problem because of its dynamically evolving nature and the ambiguity that is associated with regard to what can be defined as a rumour and what not \citep{RN675}. As an example, a post shared on Twitter\footnote{Twitter Website \url{https://twitter.com}} may contain an incorrect claim, but was not actually shared with the intent to spread misinformation.
+In contrast to that, another post may contain conspiracy theories and may have been shared in order to actively mislead, but might as well include some unrelated, but correct facts. This makes the task of automatically identifying  rumours challenging and justifies the use of elaborate methods. 
 
 \section{Related Work}
-\todo{Rewrite}
-Rumour identification and rumour analysis attract significant attention from the research community in shared tasks like RumourEval \citep{RN664}.
-According to the type of data used, rumour detection approaches can be divided into three major categories, content-based, feature-based and propagation-based.
+Over the last years, the topic of rumour identification and analysis has attracted significant attention in Academia and has been subject to studies in shared tasks such as RumourEval 2017 \citep{RN690} and RumourEval 2019 \citep{RN691}.
+Depending to the type of data that is being used, approaches for rumour identification can be divided into three major categories: \textit{message-based}, \textit{propagation-based} and \textit{stance-based}.
 \newline
-Content-based methods focus on rumour detection based on the textual con- tents of posts, including the original tweets, user comments and retweets. Generally textual contents have direct signals for misinformation and deep analysis of the Twitter messages is desirable for rumour detection. In \cite{RN676}, a RNN model is trained to automatically learn representations from tweets for rumour detection. 
+\textit{Message-based methods} focus on rumour detection based on the textual contents of the tweets, including the source tweet as well as all retweets and comments related to that tweet. The textual content of Twitter messages often has direct signals for misinformation which can be used for rumour detection. In \citet{RN676}, a RNN model is trained to automatically learn representations from tweets for rumour detection. Another approach was proposed in \citet{RN671} who proposed a GRU-based architecture to perform rumour detection at an very early stage of the propagation.
+These methods are frequently extended to also leverage non-textual features such as user profile data for rumour and misinformation detection. In \citet{RN673}, a variety of both text and user features from users’ text response and their user profiles were extracted before feeding them through a CNN-based classifier for rumour identification while in \citet{RN481}, features such as word sentiment and tweets with support / denial terms are used for rumour detection.
 \newline
-Feature-based methods use non-textual features such as user profile data for rumour and misinformation detection. In \cite{RN678}, user registration age and number of followers are used for credibility assessment. In \cite{RN677}, features such as belief identification are used for rumour detection.
+\textit{Propagation-based methods} exploit tweet propagation information for rumour classification. Even though these approaches require large amounts of metadata, they have also been able to achieve highly competitive performance.
+Recently a novel approach has been proposed by \citet{RN679} where an extended tree-structured recursive neural network (RvNN) is used to model information propagation. 
+In \citet{RN672}, a novel architecture that uses Recurrent and Convolutional Neural Networks to classify propagation paths of events on Twitter was used and in \citet{RN669}, a tree transformer model was leveraged to incorporate user interactions into the propagation classification.
 \newline
-Propagation-based methods exploit tweet propagation information to build classification models such as kernel-based methods for rumour classification.
-Recently a neural network model \cite{RN679} is proposed, where an extended tree-structured recursive neural network (RvNN) is constructed to model information propagation. Propagation-based approaches require large amounts of metadata and intensive pre-processing to model the propagation process.
-
+\textit{Stance-based methods} try to determine the rumour stance of a post with respect to the previous tweet and the source tweet. A system that leverages BERT for stance identification was published by \citet{RN665}. Another architecture built on a combination of a CNN and BERT architecture is presented in \citet{RN480}.
 
 \section{Dataset}
-The task of the project was to develop a rumour detection system and analyse the nature of rumours that are being propagated on Twitter\footnote{Twitter Website \url{https://twitter.com}}.
-The dataset for this task was given the COMP90042 teaching team. It consists of set of source tweets and their replies (incl. metadata) that has been extracted from the Twitter API.
+The task of this project was to develop a rumour detection system and analyse the nature of rumours that are being propagated on Twitter.
+The dataset for this task was published the COMP90042 teaching team and consists of set of source tweets and their replies (incl. corresponding metadata) that has been extracted from the Twitter API\footnote{Twitter API \url{https://developer.twitter.com/en/docs/twitter-api/enterprise/data-dictionary/native-enriched-objects/tweet}}.
 The training set contains a total of 4641 events which have been labeled as either \textit{RUMOUR} or \textit{NON-RUMOUR}. In order to evaluate the performance of the system, an additional development set has been made available. A detailed breakdown of the class distribution is presented in Table \ref{tab:dataset_class_distribution}.
-
 \begin{table}
 \centering
 \setlength\tabcolsep{2pt}
@@ -102,57 +107,62 @@ Test set        & -      & -          & 581   \\ \hline
 The training set is imbalanced and the majority of the tweets (approx. 66\%) belong to the non-rumour class, whereas the remaining data (approx. 34\%) belongs to the rumour class.
 
 \section{Experimental Setup}
-In section \ref{sec:task_1_rumour_detection}, we present a total of three rumour detection systems in our research.
-All three systems were implemented in Python and make use of the Transformers library \citep{RN682} which provides access to various Transformer-based architectures such as BERT, RoBERTa, DistilBERT. 
+In section \ref{sec:task_1_rumour_detection}, we present the three rumour detection systems that were used in our research.
+All three systems were implemented in Python and make use of the Transformers library \citep{RN682} which provides access to various Transformer-based architectures such as BERT, RoBERTa and DistilBERT. 
 \newline
 The experiments reported in this paper were performed on a VM instance within the Google Cloud Platform running Debian 10 with a Nvidia Tesla K80 GPU.
 
 
 \section{Task 1 - Rumour Detection}
 \label{sec:task_1_rumour_detection}
-The goal of task 1 was to build a binary classifier that can reliably predict whether a given tweet (and its corresponding replies) represents a rumour or not.
-
-\subsection{System Description}
-To evaluate the performance of different models on the dataset, we have implemented three classification systems: A BERT-based implementation (which we named \textit{PureBERT}), as well as a minor extension of this architecture that combines the Transformer architecture with tabular data (this model we called \textit{MultimodalBERT}).
-
-In addition to that, a third model (called \textit{BERTweet} has been implemented which is built on a pre-trained language model for English Tweets) \citep{RN683}. 
+The goal of task 1 was to build a binary classifier that can reliably predict whether a given tweet represents a rumour or not.
+\newline
+To evaluate the performance of different models on the dataset, we have implemented three classification systems: A BERT-based implementation which we refer to as \textit{PureBERT}, as well as an extension of this architecture that combines the BERT model with tabular data and which we refer to as \textit{MultimodalBERT}.
+\newline
+In addition to that, a third model which is built on a pre-trained language model for English Tweets \citep{RN683} has been implemented. We refer to this model as \textit{BERTweet}.
 
 \subsection{PureBERT}
 \label{sec:purebert}
-The PureBERT system was implemented using Tensorflow \citep{RN681} and uses the content of the concatenated tweet texts from the source tweets and their replies for rumour classification. 
+The \textit{PureBERT} system leverages the BERT language model that was initially published by \citet{RN688}. The model was pre-trained on the BooksCorpus \citep{RN689} and English Wikipedia and leverages the transformer architecture to provide contextualized representations for downstream tasks.
+\newline
+The \textit{PureBERT} model used in this assignment was implemented using Tensorflow \citep{RN681} and uses the textual content of the source tweets and as well as of their corresponding replies for rumour classification. 
 \newline
 \newline
 \textbf{Pre-processing routine}
 \newline
-Prior to training the models on the given data, we have employed the following pre-processing procedure to clean the data and remove Twitter-specific elements:
+Prior to training the models on the given data, we have employed the following pre-processing procedure to clean the data and remove Twitter-specific tokens:
 \begin{enumerate}[noitemsep]
 %\itemsep0em 
-    \item For every event in the dataset, extract the source tweet text and corresponding replies and concatenate them together
-    \item Remove URLs and user mentions from the resulting tweet texts
+    \item For every twitter event in the dataset, extract the source tweet text and corresponding replies and concatenate them 
+    \item Remove URLs and user mentions from the tweet texts
     \item Convert tweet texts to lower-case
 \end{enumerate}
-\textbf{Model Architecture}
-\newline
-For our experiments with PureBERT, we have used a variety of pre-trained BERT models available on Tensorflow Hub \footnote{Tensorflow Hub \url{https://tfhub.dev/google/collections/transformer_encoders_text/1}}. This includes
+For our experiments with \textit{PureBERT}, we have used a variety of pre-trained BERT models that have been made available on Tensorflow Hub\footnote{Tensorflow Hub \url{https://tfhub.dev/google/collections/transformer_encoders_text/1}}. This includes
 \begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt]
-    \item \verb|bert_en_uncased_L-12_H-768_A-12|
-    \item \verb|bert_en_uncased_L-24_H-1024_A-16|
-    \item \verb|talkheads_ggelu_bert_en_base| and 
-    \item \verb|talkheads_ggelu_bert_en_large|.
+    \item \verb|bert-base-uncased|
+    \item \verb|bert-large-uncased|
+    \item \verb|talkheads_ggelu_bert_en_base|
 \end{itemize}
-The models prefixed with \verb|talkheads_ggelu| refer to an improved BERT architecture which uses talking-heads attention and a gated linear unit with GELU activation as the first layer of the position-wise feed-forward networks (these changes were proposed by 
-\citep{RN685} and \citep{RN686}.
-\todo{Extend architecture description}
+The models \verb|bert-base-uncased| and \verb|bert-large-uncased| refer to the models that were published in the original BERT paper \citep{RN688}, while \verb|talkheads_ggelu_bert_en_base| refers to an improved BERT architecture which uses talking-heads attention and a gated linear unit with GELU activation (these changes were proposed by 
+\citet{RN685} and \citet{RN686}).
+\newline
+To provide input to the \textit{PureBERT} model, we first tokenize the input tweets via the tokenizer. For each tokenized input text.  we construct the following:
+\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt]
+    \item \textbf{input ids:} a sequence of integers identifying each input token to its index number in the \textit{PureBERT} tokenizer vocabulary
+    \item \textbf{attention mask:} a sequence of 1s and 0s, with 1s for all input tokens and 0s for all padding tokens
+\end{itemize}
+We subsequently fine-tune the pre-trained BERT models on the given input for $7$ epochs with AdamW optimizer \citep{RN687} using a learning rate of $3e^{-5}$.
+
 
 \subsection{MultimodalBERT}
-The MultimodalBERT model is built using an experimental framework called Multimodal-Toolkit which has been made available on Github\footnote{Multimodal Transformers Repository \url{https://github.com/georgian-io/Multimodal-Toolkit}}. It allows to incorporate numerical and categorical features for downstream classification. 
+The \textit{MultimodalBERT} model is built using an experimental framework called Multimodal-Toolkit which has been made available on Github\footnote{Multimodal Transformers Repository \url{https://github.com/georgian-io/Multimodal-Toolkit}}. It allows to incorporate numerical and categorical features for downstream classification. 
 \newline
-The data used by the MultimodalBERT system has been subject to the same pre-processing routine as described in section \ref{sec:purebert}. In addition to that, a variety of hand-crafted metadata features have been produced. 
+The data used by the \textit{MultimodalBERT} system has been subject to the same pre-processing routine as described in section \ref{sec:purebert}. In addition to that, a variety of hand-crafted metadata features have been produced. 
 \newline
 \newline
 \textbf{Metadata Features}
 \newline
-The context metadata can be categorized into tweet-level and user-level features. This approach was inspired by \cite{RN668} and is based on the observation that rumours may have different properties from non-rumours (e.g. rumours may be more likely to include URLs / links with unverified information). The full set of features are described in Table \ref{tbl:handcrafted_features}.
+The context metadata used by \textit{MultimodalBERT} can be categorized into tweet-level and user-level features. This approach was inspired by \cite{RN668} and is based on the observation that rumours may have different properties from non-rumours (e.g. rumours may be more likely to include links with unverified information). The full set of features that have been extracted are described in Table \ref{tbl:handcrafted_features}.
 \begin{table}
 \centering
 \begin{tabular}{l}
@@ -186,30 +196,41 @@ Whether geolocation is enabled \\
 \label{fig:multimodal_bert_architecture}
 \end{figure}
 \newline
-\newline
-\textbf{Model Architecture}
-\newline
-An overview of the MultimodalBERT architecture is given in Figure \ref{fig:multimodal_bert_architecture}. We have performed various experiments in which we performed a gated summation of the transformer outputs as well as the numerical and categorical features before final classifier layer. unfortunately we have not been able to achieve satisfactory performance on the task and have therefore discontinued the approach.
+Figure \ref{fig:multimodal_bert_architecture} gives an overview of the \textit{MultimodalBERT} architecture is given in Figure. We have performed various experiments in which we used a gated summation of the transformer outputs as well as the numerical and categorical features before the final classifier layer (a Multilayer Perceptron). Unfortunately we have not been able to achieve satisfactory performance on the task and have therefore discontinued the approach.
 
 \subsection{BERTweet}
+The \textit{BERTweet} model was published by \citet{RN683} and has been pre-trained on a corpus of 850M English Tweets. We put forward the hypothesis that tweets are fundamentally different from traditional text in terms of sequence length and the use of informal language. Hence, a language model pre-trained on a large corpus of tweets should achieve a better performance compared to a language model pre-trained on more formal language like Wikipedia.
+\newline
+We have implemented the \textit{BERTweet} model using the PyTorch framework \citep{RN684}. Since BERTweet comes with its own tokenizer \verb|BertweetTokenizer| that supports raw Twitter data, no pre-processing has been applied to the tweet texts at all.
+To provide input to the \textit{BERTweet} model, we first tokenize the input tweets via the tokenizer. For each tokenized input text.  we construct the following:
+\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt]
+    \item \textbf{input ids:} a sequence of integers identifying each input token to its index number in the BERTweet tokenizer vocabulary
+    \item \textbf{attention mask:} a sequence of 1s and 0s, with 1s for all input tokens and 0s for all padding tokens
+\end{itemize}
+We subsequently fine-tune the pre-trained BERTweet model on the given input for $7$ epochs with AdamW optimizer \citep{RN687} using a learning rate of $5e^{-5}$, and an epsilon value of $1e^{-8}$.
 
-
+\subsection{Results}
+The results of the proposed models in the COMP90042 CodaLab competition is shown in Table \ref{tbl:evaluation_scores}.
 \begin{table}
 \centering
+\small
 \setlength\tabcolsep{2pt}
 \begin{tabular}{lccc}
 \hline 
 \textbf{Model / Features} & Precision & Recall & F1 Score \\ \hline
-SVM & 1 & 1 & 1 \\
-BERT-Base & 1 & 1 & 1 \\
-BERT-Base + MLP  & 1 pt & 1 & 1 \\
+PureBert\textsubscript{base} & 0.843 & 0.745 & 0.791 \\ %v9
+PureBert\textsubscript{large} & 0.813 & 0.829 & 0.821 \\ %v11
+PureBert\textsubscript{talking heads} & 0.854 & 0.809 & 0.831 \\ %v16
+BERTweet & 0.856 & 0.819 & 0.837 \\ %v18
+MultimodalBert  & & not submitted \\
 \hline
 \end{tabular}
-\label{tbl:evaluation_scores} 
-\caption{Evaluation scores }
+\caption{Evaluation scores}
+\label{tbl:evaluation_scores}
 \end{table}
-
-\subsection{Results}
+From the table, it is evident that increasing the number of layers as well as the number of parameters enhances the performance of BERT (\textit{PureBert\textsubscript{base}} vs. \textit{PureBert\textsubscript{large})}. The performance of BERT with respect to the F1 score has further been improved by leveraging an updated BERT architecture (\textit{PureBert\textsubscript{talking heads}}). The model using the pre-trained \textit{BERTweet} model outperforms all other methods 
+\newline
+The above results support the hypothesis that that the language that is used in tweets is fundamentally different from regular natural language and hence a custom model fine-tuned exclusively on tweets is more suited for the classification of Twitter posts than a language model trained on regular English Language.
 
 \section{Task 2 - Rumour Analysis}
 
@@ -217,7 +238,7 @@ Perform some analyses to understand the nature COVID-19 rumours and how they dif
 
 \section{Conclusion}
 
-
+\newpage
 \bibliographystyle{acl_natbib}
 \bibliography{acl2021}
 
