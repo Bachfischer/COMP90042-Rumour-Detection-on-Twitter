@@ -105,6 +105,8 @@ BERTweet (num_epochs = 6) and COMBINED dataset (batch_size = 8, with sep_token="
 loaded bertweet v18 
 v35
 
+BERTweet (num_epochs = 7) and COMBINED dataset  (batch_size = 8)
+v36 (good init..)
 
 Best system by Liu and Wu (2018) "Early detection of fake news on social media through propagation path classification with recurrent and convolutional networks."
 
