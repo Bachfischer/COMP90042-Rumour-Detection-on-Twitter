@@ -1,5 +1,7 @@
 
-# OMP90042-Rumour-Detection-on-Twitter
+# COMP90042-Rumour-Detection-on-Twitter
+
+This repository contains the source code for the *Rumour Detection and Analysis on Twitter* Project that was part of the COMP90042 Natural Language Processing course at the University of Melbourne.
 
 ## Project structure
 
@@ -13,3 +15,6 @@
     * `02_rumour_analysis.ipynb` -- Notebook with analyses to understand the nature COVID-19 rumours and how they differ to their non-rumour counterpart
     * `dataloader.py` -- Source code shared across the notebooks for loading and processing Twitter data
 * `submissions/` -- Submissions to the COMP90042 CodaLab competition ([Link to competition](https://competitions.codalab.org/competitions/30503))
+
+
+For further information, please refer to the project report attached to this submission.
