@@ -5,7 +5,7 @@ This repository contains the source code for the *Rumour Detection and Analysis 
 
 ## Project structure
 
-* `data/` -- Raw datasets published by competition organizers
+* `data/` -- Raw datasets published by COMP90042 competition organizers
 * `doc/` -- Documentation and project report (LaTeX source)
 * `src/` -- Source code for task 01 (rumour identification) and task 02 (rumour analysis)
     * `01_rumour_detection_bertweet.ipynb` -- Notebook using pre-trained [BERTweet model](https://github.com/VinAIResearch/BERTweet)
@@ -13,7 +13,7 @@ This repository contains the source code for the *Rumour Detection and Analysis 
     * `01_rumour_detection_tf_with_huggingface_model_hub.ipynb` -- Notebook using pre-trained BERT models from [Hugging Face Model Hub](https://huggingface.co/models)
     * `01_rumour_detection_tf_with_tf_hub.ipynb` -- Notebook using pre-trained BERT models from [Tensorflow Hub](https://tfhub.dev)
     * `02_rumour_analysis.ipynb` -- Notebook with analyses to understand the nature COVID-19 rumours and how they differ to their non-rumour counterpart
-    * `dataloader.py` -- Source code shared across the notebooks for loading and processing Twitter data
+    * `dataloader.py` -- Source code shared by multiple notebooks for loading and processing Twitter data
 * `submissions/` -- Submissions to the COMP90042 CodaLab competition ([Link to competition](https://competitions.codalab.org/competitions/30503))
 
 
